@@ -71,12 +71,11 @@ INSERT INTO Tour VALUES
     ('South', 'Tour of wineries and outlets of Mornington Penisula'),
     ('West',  'Tour of wineries and outlets of the Geelong and Otways region');
 
-SELECT * from Tour;
-
 INSERT INTO Client VALUES 
     (1, 'Price',    'Taylor',   'M'),
     (2, 'Gamble',   'Ellyse',   'F'),
-    (3, 'Tan',      'Tilly',    'F');
+    (3, 'Tan',      'Tilly',    'F'),
+    (4, 'Waymel',   'Alexandre', 'M');
 
 
 INSERT INTO [Event] VALUES 
@@ -86,20 +85,121 @@ INSERT INTO [Event] VALUES
     ('South',   'Jan', 16,  2016, 200),
     ('West',    'Jan', 29,  2016, 225);
 
-insert INTO Booking VALUES
-('1', 'North',  'Jan',  9,  2016,   200,    '10-12-2015'),
-('2', 'North',  'Jan',  9,  2016,   200,    '16-12-2015'),
-('1', 'North',  'Feb',  13, 2016,   225,    '8-01-2016'),
-('2', 'North',  'Feb',  13, 2016,   125,    '14-01-2016'),
-('3', 'North',  'Feb',  13, 2016,   225,    '3-02-2016'),
-('1', 'South',  'Jan',  9,  2016,   200,    '10-12-2015'),
-('2', 'South',  'Jan',  16, 2016,   200,    '18-12-2015'),
-('3', 'South',  'Jan',  16, 2016,   200,    '9-01-2016'),
-('2', 'West',   'Jan',  29, 2016,   225,    '17-12-2015'),
-('3', 'West',   'Jan',  29, 2016,   200,    '18-12-2015');
+INSERT INTO Booking (ClientID, TourName, EventMonth, EventDay, EventYear, Payment, DateBooked) VALUES
+    (1, 'North',   'Jan', 9,  2016,   200,    '2015-12-10'),
+    (2, 'North',   'Jan', 9,  2016,   200,    '2015-12-16'),
+    (1, 'North',   'Feb', 13, 2016,   225,    '2016-01-08'),
+    (2, 'North',   'Feb', 13, 2016,   125,    '2016-01-14'),
+    (3, 'North',   'Feb', 13, 2016,   225,    '2016-02-03'),
+    (1, 'South',   'Jan', 9,  2016,   200,    '2015-12-10'),
+    (2, 'South',   'Jan', 16, 2016,   200,    '2015-12-18'),
+    (3, 'South',   'Jan', 16, 2016,   200,    '2016-01-09'),
+    (2, 'West' ,   'Jan', 29, 2016,   225,    '2015-12-17'),
+    (3, 'West' ,   'Jan', 29, 2016,   200,    '2015-12-18');
+
+            --task4
+--1
+
+SELECT C.GivenName, C.Surname, T.TourName, T.DESCRIPTION, E.EventYear, E.EventMonth,E.EventDay,E.Fee, B.DateBooked, B.Payment
+FROM Booking AS B 
+
+INNER JOIN Client AS C
+ON B.ClientID = C.ClientID
+
+INNER JOIN Event AS E 
+ON B.TourName = E.TourName AND B.EventYear = E.EventYear AND B.EventMonth = E.EventMonth AND B.EventDay = E.EventDay
+
+INNER JOIN Tour AS T 
+ON E.TourName = T.TourName;
+
+
+--2
+SELECT EventMonth, TourName , COUNT(*) AS 'Num Bookings'
+FROM Booking
+GROUP BY EventMonth, TourName;
 
 
 
 
+--3
+
+SELECT *
+FROM Booking
+where Payment > 
+    (
+        SELECT AVG(Payment) FROM booking
+    );
+
+                --task 5
+GO
+CREATE VIEW [Task4View] AS
+
+    SELECT C.GivenName, C.Surname, T.TourName, T.Description, E.EventYear, E.EventMonth, E.EventDay,E.Fee, B.DateBooked, B.Payment
+    FROM Booking AS B 
+
+    INNER JOIN Client AS C
+    ON B.ClientID = C.ClientID
+
+    INNER JOIN Event AS E 
+    ON B.TourName = E.TourName AND B.EventYear = E.EventYear AND B.EventMonth = E.EventMonth AND B.EventDay = E.EventDay
+
+    INNER JOIN Tour AS T 
+    ON E.TourName = T.TourName;
+GO
 
 
+
+                --Task 6
+
+
+--test client 
+select * from Client             -- 4 client created
+select count(*) from Client      -- 4 return rows
+
+--test booking 
+select * from booking           --  10 rows created 
+select count(*) from booking    --  return 10 rows as well
+
+--test Event
+SELECT * FROM Event             -- 5 row created
+select count(*) from Event      -- numbre 5 return 
+
+select * FROM Tour                 --2 row created
+select count(*) from tour          --2 rows return 
+
+
+select * FROm [Task4View]; -- 10 rows are retruned with the view 
+
+
+        -- test Q1
+
+        SELECT * 
+        FROM [Task4View]; -- 10 coloms are return missing the clientID , and gender because not required on task 4
+
+        SELECT count(*) AS 'Total'
+        FROM [Task4View]; -- the numbre 10 are return
+
+
+        -- test Q2
+
+--check with the view 
+SELECT TourName 
+    FROM [Task4View]
+    -- only North, South, West as a tourname. I will calcul the totla of the 3
+    WHERE TourName = 'North' OR TourName = 'South' or TourName = 'West'; -- 10 rows return  like the numbre of booking 
+ 
+
+
+        -- test Q3
+
+    -- the query 3 RETURN 3 rows with greater average payment 
+
+    --I check the AVR manually
+    --Average Numbre: 200 + 225 + 200 + 200 + 200 + 225 + 125 + 225 + 200 + 200 = 2000 
+    -- 2000 / 10 booking  ===   Average of 200
+    -- and I do use the view created for task 5, to check all the data with one table
+
+    SELECT *
+    FROM [Task4View]
+    WHERE Payment > 200;
+    
